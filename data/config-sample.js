@@ -31,6 +31,6 @@ const config = {
             }
         }
     },
-    whitelistIPs: ["127.0.0.1"]
+    whitelistIPs: []
 };
 module.exports = config;
