@@ -12,8 +12,6 @@ export function getProperty(propertyName: "application.passcode"): string;
 
 export function getProperty(propertyName: "application.https"): types.ConfigHTTPS;
 
-export function getProperty(propertyName: "url"): string;
-
 export function getProperty(propertyName: string): any {
 
   const propertyNameSplit = propertyName.split(".");
