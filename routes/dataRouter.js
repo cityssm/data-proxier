@@ -8,7 +8,7 @@ const dataCache = new map_expire_1.Cache(10);
 router.all("/", (_req, res) => {
     res.json({
         success: true,
-        status: "Ready"
+        message: "Ready"
     });
 });
 router.all("/:dataName", (req, res) => {

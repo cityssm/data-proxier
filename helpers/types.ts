@@ -10,6 +10,8 @@ export interface Config {
   data: {
     [dataName: string]: ConfigData;
   };
+
+  whitelistIPs: string[];
 }
 
 interface ConfigApplication {

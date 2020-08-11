@@ -14,7 +14,7 @@ const dataCache = new Cache(10);
 router.all("/", (_req, res) => {
   res.json({
     success: true,
-    status: "Ready"
+    message: "Ready"
   });
 });
 
