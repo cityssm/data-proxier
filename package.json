@@ -2,8 +2,8 @@
   "name": "data-proxier",
   "version": "1.0.0",
   "description": "Limit the amount of data exposed using a proxy.",
-  "main": "app.js",
   "scripts": {
+    "start": "node ./bin/www",
     "test": "mocha",
     "coverage": "nyc npm run test"
   },
