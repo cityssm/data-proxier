@@ -1,8 +1,16 @@
 "use strict";
+const log = require("fancy-log");
 const express_1 = require("express");
-const mssqlGetter = require("../getters/mssqlGetter");
 const map_expire_1 = require("@cityssm/map-expire");
-const config = require("../data/config");
+const mssqlGetter = require("../getters/mssqlGetter");
+let config;
+try {
+    config = require("../data/config");
+}
+catch (_e) {
+    log.warn("Using data/config-sample.js");
+    config = require("../data/config-sample");
+}
 const router = express_1.Router();
 const dataCache = new map_expire_1.Cache(10);
 router.all("/", (_req, res) => {

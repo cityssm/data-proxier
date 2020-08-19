@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProperty = void 0;
 const log = require("fancy-log");
-let config = "";
+let config;
 try {
     config = require("../data/config");
 }

@@ -7,7 +7,7 @@ import * as types from "./types";
  * LOAD CONFIGURATION
  */
 
-let config = "";
+let config: types.Config;
 
 try {
   config = require("../data/config");

@@ -1,10 +1,21 @@
+import * as log from "fancy-log";
 import { Router } from "express";
+import { Cache } from "@cityssm/map-expire";
 
 import * as mssqlGetter from "../getters/mssqlGetter";
 
-import { Cache } from "@cityssm/map-expire";
+import type { Config } from "../helpers/types";
 
-import * as config from "../data/config";
+// Load config
+
+let config: Config;
+
+try {
+  config = require("../data/config");
+} catch (_e) {
+  log.warn("Using data/config-sample.js");
+  config = require("../data/config-sample");
+}
 
 
 const router = Router();
