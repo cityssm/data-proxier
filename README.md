@@ -1,6 +1,8 @@
 # data-proxier
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f202b6b96c894f778fc30dfef4545e39)](https://app.codacy.com/gh/cityssm/data-proxier?utm_source=github.com&utm_medium=referral&utm_content=cityssm/data-proxier&utm_campaign=Badge_Grade_Dashboard)
+[![Maintainability](https://api.codeclimate.com/v1/badges/190d3317fe3287edd1f2/maintainability)](https://codeclimate.com/github/cityssm/data-proxier/maintainability)
+[![Build Status](https://travis-ci.com/cityssm/data-proxier.svg?branch=master)](https://travis-ci.com/cityssm/data-proxier)
 
 The data-proxier tool acts as a real-time buffer between a database server
 and an application server.  It provides data in "easy to consume" JSON.
