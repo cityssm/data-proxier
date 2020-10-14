@@ -61,7 +61,8 @@ router.all("/:dataName", (req, res) => {
                 else {
                     return res.json({
                         success: false,
-                        message: resultJSON.message
+                        message: resultJSON.message,
+                        error: resultJSON.error
                     });
                 }
             });
