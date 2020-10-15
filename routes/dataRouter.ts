@@ -4,7 +4,7 @@ import { Cache } from "@cityssm/map-expire";
 
 import * as mssqlGetter from "../getters/mssqlGetter";
 
-import type { Config } from "../helpers/types";
+import type { Config, GetData_Return_Success, GetData_Return_Error } from "../helpers/types";
 
 // Load config
 
@@ -16,6 +16,8 @@ try {
   log.warn("Using data/config-sample.js");
   config = require("../data/config-sample");
 }
+
+Object.freeze(config);
 
 
 const router = Router();
@@ -30,7 +32,7 @@ router.all("/", (_req, res) => {
 });
 
 
-router.all("/:dataName", (req, res) => {
+router.all("/:dataName", async(req, res) => {
 
   const dataName = req.params.dataName;
 
@@ -75,33 +77,13 @@ router.all("/:dataName", (req, res) => {
 
   // Get the data
 
+  let result: GetData_Return_Success | GetData_Return_Error;
+
   switch (credentialConfig.credentialType) {
 
     case "mssql":
 
-      mssqlGetter.getData(req.query, dataConfig, credentialConfig, function(resultJSON) {
-
-        if (resultJSON.success) {
-
-          if (dataConfig.cacheSeconds > 0) {
-            dataCache.set(dataName, resultJSON.data, dataConfig.cacheSeconds);
-          }
-
-          return res.json({
-            success: true,
-            fromCache: false,
-            data: resultJSON.data
-          });
-
-        } else {
-          return res.json({
-            success: false,
-            message: resultJSON.message,
-            error: resultJSON.error
-          });
-        }
-      });
-
+      result = await mssqlGetter.getData(req.query, dataConfig);
       break;
 
     default:
@@ -109,6 +91,26 @@ router.all("/:dataName", (req, res) => {
         success: false,
         message: "Unknown credentialType: " + (credentialConfig.credentialType as string)
       });
+  }
+
+  if (result.success) {
+
+    if (dataConfig.cacheSeconds > 0) {
+      dataCache.set(dataName, result.data, dataConfig.cacheSeconds);
+    }
+
+    return res.json({
+      success: true,
+      fromCache: false,
+      data: result.data
+    });
+
+  } else {
+    return res.json({
+      success: false,
+      message: (result as GetData_Return_Error).message,
+      error: (result as GetData_Return_Error).error
+    });
   }
 });
 

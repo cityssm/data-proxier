@@ -37,3 +37,14 @@ export interface ConfigData {
   query?: (configParams: { [paramName: string]: any }, getParams: { [paramName: string]: string }) => string;
   configParams?: { [paramName: string]: any };
 }
+
+export interface GetData_Return_Success {
+  success: true;
+  data: Array<{ [columnName: string]: any}>;
+}
+
+export interface GetData_Return_Error {
+  success: false;
+  message: string;
+  error: Error;
+};

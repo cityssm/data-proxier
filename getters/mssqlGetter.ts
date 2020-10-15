@@ -1,48 +1,30 @@
-import * as sql from "mssql";
-
-import type { ConfigData, ConfigCredentials } from "../helpers/types";
+import * as mssqlConnectionPools from "../helpers/mssqlConnectionPools";
 
 
-export const getData = (reqQuery: { [paramName: string]: any },
-  dataConfig: ConfigData,
-  credentialConfig: ConfigCredentials,
-  callbackFn: (result: {
-    success: boolean;
-    message?: string;
-    error?: Error;
-    data?: Array<{ [columnName: string]: any }>;
-  }) => void) => {
+import type { ConfigData, GetData_Return_Success, GetData_Return_Error } from "../helpers/types";
 
-  sql.connect(credentialConfig.config, (err: Error) => {
 
-    if (err) {
-      callbackFn({
-        success: false,
-        message: "Connection Error",
-        error: err
-      });
+export async function getData(reqQuery: { [paramName: string]: any },
+  dataConfig: ConfigData): Promise<GetData_Return_Success | GetData_Return_Error> {
 
-      return;
-    }
-
+  try {
     const sqlQuery = dataConfig.query(dataConfig.configParams, reqQuery);
 
-    new sql.Request().query(sqlQuery, (err: Error, result) => {
+    const pool = await mssqlConnectionPools.getPool(dataConfig.credentialName);
 
-      if (err) {
-        callbackFn({
-          success: false,
-          message: "Query Error",
-          error: err
-        });
+    const result = await pool.request().query(sqlQuery);
 
-        return;
-      }
+    return {
+      success: true,
+      data: result.recordset
+    };
 
-      callbackFn({
-        success: true,
-        data: result.recordset
-      });
-    });
-  });
+  } catch (e) {
+
+    return {
+      success: false,
+      message: "Query Error",
+      error: e
+    };
+  }
 };

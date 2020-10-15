@@ -35,4 +35,15 @@ export interface ConfigData {
         [paramName: string]: any;
     };
 }
+export interface GetData_Return_Success {
+    success: true;
+    data: Array<{
+        [columnName: string]: any;
+    }>;
+}
+export interface GetData_Return_Error {
+    success: false;
+    message: string;
+    error: Error;
+}
 export {};

@@ -1,11 +1,4 @@
-import type { ConfigData, ConfigCredentials } from "../helpers/types";
-export declare const getData: (reqQuery: {
+import type { ConfigData, GetData_Return_Success, GetData_Return_Error } from "../helpers/types";
+export declare function getData(reqQuery: {
     [paramName: string]: any;
-}, dataConfig: ConfigData, credentialConfig: ConfigCredentials, callbackFn: (result: {
-    success: boolean;
-    message?: string;
-    error?: Error;
-    data?: {
-        [columnName: string]: any;
-    }[];
-}) => void) => void;
+}, dataConfig: ConfigData): Promise<GetData_Return_Success | GetData_Return_Error>;
