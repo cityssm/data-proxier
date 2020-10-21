@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/cityssm/data-proxier#readme",
   "dependencies": {
-    "@cityssm/map-expire": "^0.3.3",
+    "@cityssm/map-expire": "^1.0.0",
     "@cityssm/mssql-multi-pool": "^1.0.0",
     "compression": "^1.7.4",
     "express": "^4.17.1",
