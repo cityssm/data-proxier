@@ -10,12 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getData = void 0;
-const mssqlConnectionPools = require("../helpers/mssqlConnectionPools");
+const configFns = require("../helpers/configFns");
+const sql = require("@cityssm/mssql-multi-pool");
 function getData(reqQuery, dataConfig) {
     return __awaiter(this, void 0, void 0, function* () {
+        const connectionConfig = configFns.getProperty("credentials")[dataConfig.credentialName].config;
         try {
             const sqlQuery = dataConfig.query(dataConfig.configParams, reqQuery);
-            const pool = yield mssqlConnectionPools.getPool(dataConfig.credentialName);
+            const pool = yield sql.connect(connectionConfig);
             const result = yield pool.request().query(sqlQuery);
             return {
                 success: true,
