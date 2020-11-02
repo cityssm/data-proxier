@@ -1,6 +1,6 @@
 # data-proxier
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f202b6b96c894f778fc30dfef4545e39)](https://app.codacy.com/gh/cityssm/data-proxier?utm_source=github.com&utm_medium=referral&utm_content=cityssm/data-proxier&utm_campaign=Badge_Grade_Dashboard) [![Maintainability](https://api.codeclimate.com/v1/badges/190d3317fe3287edd1f2/maintainability)](https://codeclimate.com/github/cityssm/data-proxier/maintainability) [![Build Status](https://travis-ci.com/cityssm/data-proxier.svg?branch=master)](https://travis-ci.com/cityssm/data-proxier)
+[![Codacy Badge](https://img.shields.io/codacy/grade/f202b6b96c894f778fc30dfef4545e39)](https://app.codacy.com/gh/cityssm/data-proxier?utm_source=github.com&utm_medium=referral&utm_content=cityssm/data-proxier&utm_campaign=Badge_Grade_Dashboard) [![Maintainability](https://img.shields.io/codeclimate/maintainability/cityssm/data-proxier)](https://codeclimate.com/github/cityssm/data-proxier/maintainability) [![Build Status](https://img.shields.io/travis/cityssm/data-proxier)](https://travis-ci.com/cityssm/data-proxier) [![David](https://img.shields.io/david/cityssm/data-proxier)](https://david-dm.org/cityssm/data-proxier) ![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/cityssm/data-proxier)
 
 The data-proxier tool acts as a real-time buffer between a database server
 and an application server.  It provides data in "easy to consume" JSON.
