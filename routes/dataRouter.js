@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 const log = require("fancy-log");
 const express_1 = require("express");
 const map_expire_1 = require("@cityssm/map-expire");
@@ -29,7 +20,7 @@ router.all("/", (_req, res) => {
         message: "Ready"
     });
 });
-router.all("/:dataName", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.all("/:dataName", async (req, res) => {
     const dataName = req.params.dataName;
     const dataConfig = config.data[dataName];
     if (!dataConfig) {
@@ -58,7 +49,7 @@ router.all("/:dataName", (req, res) => __awaiter(void 0, void 0, void 0, functio
     let result;
     switch (credentialConfig.credentialType) {
         case "mssql":
-            result = yield mssqlGetter.getData(req.query, dataConfig);
+            result = await mssqlGetter.getData(req.query, dataConfig);
             break;
         default:
             return res.json({
@@ -83,5 +74,5 @@ router.all("/:dataName", (req, res) => __awaiter(void 0, void 0, void 0, functio
             error: result.error
         });
     }
-}));
+});
 module.exports = router;
