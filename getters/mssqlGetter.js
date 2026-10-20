@@ -1,26 +1,25 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getData = void 0;
-const configFns = require("../helpers/configFns");
-const sql = require("@cityssm/mssql-multi-pool");
-async function getData(reqQuery, dataConfig) {
-    const connectionConfig = configFns.getProperty("credentials")[dataConfig.credentialName].config;
+import mssql from '@cityssm/mssql-multi-pool';
+import { getConfigProperty } from '../helpers/config.functions.js';
+const credentialsConfigs = getConfigProperty('credentials');
+export async function getData(requestQuery, dataConfig) {
+    const connectionConfig = credentialsConfigs[dataConfig.credentialName]?.config;
     try {
-        const sqlQuery = dataConfig.query(dataConfig.configParams, reqQuery);
-        const pool = await sql.connect(connectionConfig);
+        if (connectionConfig === undefined) {
+            throw new Error('Missing connection configuration');
+        }
+        const sqlQuery = dataConfig.query(dataConfig.configParams ?? {}, requestQuery);
+        const pool = await mssql.connect(connectionConfig);
         const result = await pool.request().query(sqlQuery);
         return {
             success: true,
             data: result.recordset
         };
     }
-    catch (e) {
+    catch (error) {
         return {
             success: false,
-            message: "Query Error",
-            error: e
+            error,
+            message: 'Query Error'
         };
     }
 }
-exports.getData = getData;
-;

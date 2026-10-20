@@ -1,14 +1,16 @@
-import { Service } from "node-windows";
+/* eslint-disable unicorn/filename-case */
 
-import { windowsServiceConfig } from "./windowsServiceConfig";
+import { Service } from 'node-windows'
+
+import { windowsServiceConfig } from './windowsServiceConfig.js'
 
 // Create a new service object
-const svc = new Service(windowsServiceConfig);
+const svc = new Service(windowsServiceConfig)
 
 // Listen for the "install" event, which indicates the
 // process is available as a service.
-svc.on("install", () => {
-  svc.start();
-});
+svc.on('install', () => {
+  svc.start()
+})
 
-svc.install();
+svc.install()

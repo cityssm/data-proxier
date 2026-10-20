@@ -1,118 +1,119 @@
-import * as log from "fancy-log";
-import { Router } from "express";
-import { Cache } from "@cityssm/map-expire";
+import { NodeCache } from '@cacheable/node-cache'
+import { Router } from 'express'
 
-import * as mssqlGetter from "../getters/mssqlGetter";
+import * as mssqlGetter from '../getters/mssqlGetter.js'
+import { getConfigProperty } from '../helpers/config.functions.js'
+import type {
+  GetDataResponseError,
+  GetDataResponseSuccess
+} from '../helpers/types.js'
 
-import type { Config, GetData_Return_Success, GetData_Return_Error } from "../helpers/types";
+export default function getDataRouter(): Router {
+  const router = Router()
 
-// Load config
+  const dataCache = new NodeCache({
+    stdTTL: 30 // Default cache time-to-live in seconds
+  })
 
-let config: Config;
+  const credentialsConfigs = getConfigProperty('credentials')
+  const dataConfigs = getConfigProperty('data')
 
-try {
-  config = require("../data/config");
-} catch (_e) {
-  log.warn("Using data/config-sample.js");
-  config = require("../data/config-sample");
-}
+  router.all('/', (_request, response) => {
+    response.json({
+      success: true,
 
-Object.freeze(config);
+      message: 'Ready'
+    })
+  })
 
+  router.all('/:dataName', async (request, response) => {
+    const dataName = request.params.dataName
 
-const router = Router();
-const dataCache = new Cache(10);
+    // Load the data configuration
 
+    const dataConfig = dataConfigs[dataName]
 
-router.all("/", (_req, res) => {
-  res.json({
-    success: true,
-    message: "Ready"
-  });
-});
-
-
-router.all("/:dataName", async(req, res) => {
-
-  const dataName = req.params.dataName;
-
-  // Load the data configuration
-
-  const dataConfig = config.data[dataName];
-
-  if (!dataConfig) {
-
-    return res.json({
-      success: false,
-      message: "Data configuration not found: " + dataName
-    });
-  }
-
-  // Check the cache
-
-  if (dataConfig.cacheSeconds > 0) {
-
-    const data = dataCache.get(dataName);
-
-    if (data) {
-      return res.json({
-        success: true,
-        fromCache: true,
-        data
-      });
-    }
-  }
-
-  // Load the credentials
-
-  const credentialConfig = config.credentials[dataConfig.credentialName];
-
-  if (!credentialConfig) {
-
-    return res.json({
-      success: false,
-      message: "Credential configuration not found: " + dataConfig.credentialName
-    });
-  }
-
-  // Get the data
-
-  let result: GetData_Return_Success | GetData_Return_Error;
-
-  switch (credentialConfig.credentialType) {
-
-    case "mssql":
-
-      result = await mssqlGetter.getData(req.query, dataConfig);
-      break;
-
-    default:
-      return res.json({
+    if (dataConfig === undefined) {
+      return response.json({
         success: false,
-        message: "Unknown credentialType: " + (credentialConfig.credentialType as string)
-      });
-  }
 
-  if (result.success) {
+        message: `Data configuration not found: ${dataName}`
+      })
+    }
+
+    // Check the cache
 
     if (dataConfig.cacheSeconds > 0) {
-      dataCache.set(dataName, result.data, dataConfig.cacheSeconds);
+      const data = dataCache.get(dataName)
+
+      if (data !== undefined) {
+        return response.json({
+          success: true,
+
+          data,
+          fromCache: true
+        })
+      }
     }
 
-    return res.json({
-      success: true,
-      fromCache: false,
-      data: result.data
-    });
+    // Load the credentials
 
-  } else {
-    return res.json({
-      success: false,
-      message: (result as GetData_Return_Error).message,
-      error: (result as GetData_Return_Error).error
-    });
-  }
-});
+    const credentialConfig = credentialsConfigs[dataConfig.credentialName]
 
+    if (credentialConfig === undefined) {
+      return response.json({
+        success: false,
 
-export = router;
+        message: `Credential configuration not found: ${dataConfig.credentialName}`
+      })
+    }
+
+    // Get the data
+
+    let result: GetDataResponseError | GetDataResponseSuccess
+
+    // eslint-disable-next-line sonarjs/no-small-switch
+    switch (credentialConfig.credentialType) {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      case 'mssql': {
+        result = await mssqlGetter.getData(request.query, dataConfig)
+        break
+      }
+
+      // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
+      default: {
+        response.json({
+          success: false,
+
+          message: `Unknown credentialType: ${
+            credentialConfig.credentialType as string
+          }`
+        })
+
+        return
+      }
+    }
+
+    if (result.success) {
+      if (dataConfig.cacheSeconds > 0) {
+        dataCache.set(dataName, result.data, dataConfig.cacheSeconds)
+      }
+
+      response.json({
+        success: true,
+
+        data: result.data,
+        fromCache: false
+      })
+    } else {
+      response.json({
+        success: false,
+
+        error: (result as GetDataResponseError).error,
+        message: (result as GetDataResponseError).message
+      })
+    }
+  })
+
+  return router
+}

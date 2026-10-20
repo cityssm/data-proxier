@@ -1,41 +1,54 @@
-import * as express from "express";
-import * as compression from "compression";
+import { isLocal } from '@cityssm/is-private-network-address'
+import compression from 'compression'
+import Debug from 'debug'
+import express from 'express'
 
-import * as configFns from "./helpers/configFns";
+import { DEBUG_NAMESPACE } from './debug.config.js'
+import { getConfigProperty } from './helpers/config.functions.js'
+import getDataRouter from './routes/dataRouter.js'
 
-import * as routerData from "./routes/dataRouter";
+const debug = Debug(`${DEBUG_NAMESPACE}:app`)
 
+export default function getApp(): express.Express {
+  const app = express()
 
-const app = express();
+  app.use(compression())
 
-app.use(compression());
+  app.use(
+    express.urlencoded({
+      extended: false
+    })
+  )
 
-app.use(express.urlencoded({
-  extended: false
-}));
+  app.use(
+    '/',
+    (
+      request: express.Request,
+      response: express.Response,
+      next: express.NextFunction
+    ) => {
+      debug(request.ip)
 
-const localIPs = ["127.0.0.1", "1"];
+      const ipAddress = request.ip?.split(':').pop()
 
+      if (
+        ipAddress !== undefined &&
+        (isLocal(ipAddress) ||
+          getConfigProperty('whitelistIPs').includes(ipAddress))
+      ) {
+        next()
 
-const ipChecker = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        return
+      }
 
-  console.log(req.ip);
+      return response.json({
+        success: false,
 
-  const ipAddress = req.ip.split(":").pop();
+        message: `IP address not allowed: ${ipAddress}`
+      })
+    },
+    getDataRouter()
+  )
 
-  if (localIPs.includes(ipAddress) ||
-    configFns.getProperty("whitelistIPs").includes(ipAddress)) {
-    return next();
-  }
-
-  return res.json({
-    success: false,
-    message: "IP address not allowed: " + ipAddress
-  });
-};
-
-
-app.use("/", ipChecker, routerData);
-
-
-export = app;
+  return app
+}

@@ -1,50 +1,55 @@
-import type { config as MSSQLDatabaseConfig } from "mssql";
+/* eslint-disable unicorn/name-replacements */
+
+import type { config as MSSQLDatabaseConfig } from 'mssql'
 
 export interface Config {
-  application?: ConfigApplication;
+  application?: ConfigApplication
 
-  credentials: {
-    [credentialName: string]: ConfigCredentials;
-  };
+  credentials: Record<string, ConfigCredentials>
 
-  data: {
-    [dataName: string]: ConfigData;
-  };
+  data: Record<string, ConfigData>
 
-  whitelistIPs: string[];
+  whitelistIPs: string[]
 }
 
 interface ConfigApplication {
-  httpPort?: number;
-  https?: ConfigHTTPS;
+  httpPort?: number
+  https?: ConfigHTTPS
 }
 
 export interface ConfigHTTPS {
-  port: number;
-  keyPath: string;
-  certPath: string;
-  passphrase?: string;
+  port: number
+  keyPath: string
+  certPath: string
+  passphrase?: string
 }
 
 export interface ConfigCredentials {
-  credentialType: "mssql";
-  config: MSSQLDatabaseConfig;
+  credentialType: 'mssql'
+  config: MSSQLDatabaseConfig
 }
 
 export interface ConfigData {
-  credentialName: string;
-  cacheSeconds: number;
-  query?: (configParams: { [paramName: string]: any }, getParams: { [paramName: string]: string }) => string;
-  configParams?: { [paramName: string]: any };
+  credentialName: string
+  cacheSeconds: number
+
+  query: (
+    configParameters: Record<string, unknown>,
+    getParameters: Record<string, string>
+  ) => string
+
+  configParams?: Record<string, unknown>
 }
 
-export interface GetData_Return_Success {
-  success: true;
-  data: Array<{ [columnName: string]: any}>;
+export interface GetDataResponseSuccess {
+  success: true
+
+  data: Array<Record<string, unknown>>
 }
 
-export interface GetData_Return_Error {
-  success: false;
-  message: string;
-  error: Error;
-};
+export interface GetDataResponseError {
+  success: false
+
+  error: unknown
+  message: string
+}

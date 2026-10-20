@@ -1,9 +1,7 @@
 # data-proxier
 
-[![Codacy Badge](https://img.shields.io/codacy/grade/f202b6b96c894f778fc30dfef4545e39)](https://app.codacy.com/gh/cityssm/data-proxier?utm_source=github.com&utm_medium=referral&utm_content=cityssm/data-proxier&utm_campaign=Badge_Grade_Dashboard) [![Maintainability](https://img.shields.io/codeclimate/maintainability/cityssm/data-proxier)](https://codeclimate.com/github/cityssm/data-proxier/maintainability) [![Build Status](https://img.shields.io/travis/cityssm/data-proxier)](https://travis-ci.com/cityssm/data-proxier) [![David](https://img.shields.io/david/cityssm/data-proxier)](https://david-dm.org/cityssm/data-proxier) ![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/cityssm/data-proxier)
-
 The data-proxier tool acts as a real-time buffer between a database server
-and an application server.  It provides data in "easy to consume" JSON.
+and an application server. It provides data in "easy to consume" JSON.
 
 ## Supported Data Sources
 
@@ -13,12 +11,12 @@ The application was written with the ability to support other data sources in mi
 
 ## Features
 
--   Connect to multiple databases from one easy to access point.
+- Connect to multiple databases from one easy to access point.
 
--   IP address whitelisting.
+- IP address whitelisting.
 
--   Receive fresh data every time, or cache query results in memory
-    for a short period of time to reduce the burden on the database.
+- Receive fresh data every time, or cache query results in memory
+  for a short period of time to reduce the burden on the database.
 
 ## But Why?
 
@@ -34,4 +32,4 @@ may not be an option.
 
 Also, it is often desirable to limit the amount of data that is exposed.
 Using an application like the data-proxier tool lets you choose which
-tables, which columns, and which rows to share.  Not the whole database!
+tables, which columns, and which rows to share. Not the whole database!

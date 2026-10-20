@@ -2,12 +2,7 @@
 coverage/
 node_modules/
 
-app.min.js
-data/*.db
-data/*.min.js
-data/config.js
-data/config.d.ts
-data/config.ts
-helpers/*.min.js
-routes/*.min.js
+data/config.*
 *.pem
+
+.tsbuildinfo

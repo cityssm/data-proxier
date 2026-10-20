@@ -1,33 +1,45 @@
-import * as configFns from "../helpers/configFns";
-import * as sql from "@cityssm/mssql-multi-pool";
+import mssql from '@cityssm/mssql-multi-pool'
 
+import { getConfigProperty } from '../helpers/config.functions.js'
+import type {
+  ConfigData,
+  GetDataResponseError,
+  GetDataResponseSuccess
+} from '../helpers/types.js'
 
-import type { ConfigData, GetData_Return_Success, GetData_Return_Error } from "../helpers/types";
+const credentialsConfigs = getConfigProperty('credentials')
 
-
-export async function getData(reqQuery: { [paramName: string]: any },
-  dataConfig: ConfigData): Promise<GetData_Return_Success | GetData_Return_Error> {
-
-  const connectionConfig = configFns.getProperty("credentials")[dataConfig.credentialName].config;
+export async function getData(
+  requestQuery: Record<string, string>,
+  dataConfig: ConfigData
+): Promise<GetDataResponseError | GetDataResponseSuccess> {
+  const connectionConfig = credentialsConfigs[dataConfig.credentialName]?.config
 
   try {
-    const sqlQuery = dataConfig.query(dataConfig.configParams, reqQuery);
+    if (connectionConfig === undefined) {
+      throw new Error('Missing connection configuration')
+    }
 
-    const pool = await sql.connect(connectionConfig);
+    const sqlQuery = dataConfig.query(
+      dataConfig.configParams ?? {},
+      requestQuery
+    )
 
-    const result = await pool.request().query(sqlQuery);
+    const pool = await mssql.connect(connectionConfig)
+
+    const result = await pool.request().query(sqlQuery)
 
     return {
       success: true,
+
       data: result.recordset
-    };
-
-  } catch (e) {
-
+    }
+  } catch (error) {
     return {
       success: false,
-      message: "Query Error",
-      error: e
-    };
+
+      error,
+      message: 'Query Error'
+    }
   }
-};
+}

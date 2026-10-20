@@ -1,78 +1,77 @@
-"use strict";
-const log = require("fancy-log");
-const express_1 = require("express");
-const map_expire_1 = require("@cityssm/map-expire");
-const mssqlGetter = require("../getters/mssqlGetter");
-let config;
-try {
-    config = require("../data/config");
-}
-catch (_e) {
-    log.warn("Using data/config-sample.js");
-    config = require("../data/config-sample");
-}
-Object.freeze(config);
-const router = express_1.Router();
-const dataCache = new map_expire_1.Cache(10);
-router.all("/", (_req, res) => {
-    res.json({
-        success: true,
-        message: "Ready"
+import { NodeCache } from '@cacheable/node-cache';
+import { Router } from 'express';
+import * as mssqlGetter from '../getters/mssqlGetter.js';
+import { getConfigProperty } from '../helpers/config.functions.js';
+export default function getDataRouter() {
+    const router = Router();
+    const dataCache = new NodeCache({
+        stdTTL: 30
     });
-});
-router.all("/:dataName", async (req, res) => {
-    const dataName = req.params.dataName;
-    const dataConfig = config.data[dataName];
-    if (!dataConfig) {
-        return res.json({
-            success: false,
-            message: "Data configuration not found: " + dataName
-        });
-    }
-    if (dataConfig.cacheSeconds > 0) {
-        const data = dataCache.get(dataName);
-        if (data) {
-            return res.json({
-                success: true,
-                fromCache: true,
-                data
-            });
-        }
-    }
-    const credentialConfig = config.credentials[dataConfig.credentialName];
-    if (!credentialConfig) {
-        return res.json({
-            success: false,
-            message: "Credential configuration not found: " + dataConfig.credentialName
-        });
-    }
-    let result;
-    switch (credentialConfig.credentialType) {
-        case "mssql":
-            result = await mssqlGetter.getData(req.query, dataConfig);
-            break;
-        default:
-            return res.json({
-                success: false,
-                message: "Unknown credentialType: " + credentialConfig.credentialType
-            });
-    }
-    if (result.success) {
-        if (dataConfig.cacheSeconds > 0) {
-            dataCache.set(dataName, result.data, dataConfig.cacheSeconds);
-        }
-        return res.json({
+    const credentialsConfigs = getConfigProperty('credentials');
+    const dataConfigs = getConfigProperty('data');
+    router.all('/', (_request, response) => {
+        response.json({
             success: true,
-            fromCache: false,
-            data: result.data
+            message: 'Ready'
         });
-    }
-    else {
-        return res.json({
-            success: false,
-            message: result.message,
-            error: result.error
-        });
-    }
-});
-module.exports = router;
+    });
+    router.all('/:dataName', async (request, response) => {
+        const dataName = request.params.dataName;
+        const dataConfig = dataConfigs[dataName];
+        if (dataConfig === undefined) {
+            return response.json({
+                success: false,
+                message: `Data configuration not found: ${dataName}`
+            });
+        }
+        if (dataConfig.cacheSeconds > 0) {
+            const data = dataCache.get(dataName);
+            if (data !== undefined) {
+                return response.json({
+                    success: true,
+                    data,
+                    fromCache: true
+                });
+            }
+        }
+        const credentialConfig = credentialsConfigs[dataConfig.credentialName];
+        if (credentialConfig === undefined) {
+            return response.json({
+                success: false,
+                message: `Credential configuration not found: ${dataConfig.credentialName}`
+            });
+        }
+        let result;
+        switch (credentialConfig.credentialType) {
+            case 'mssql': {
+                result = await mssqlGetter.getData(request.query, dataConfig);
+                break;
+            }
+            default: {
+                response.json({
+                    success: false,
+                    message: `Unknown credentialType: ${credentialConfig.credentialType}`
+                });
+                return;
+            }
+        }
+        if (result.success) {
+            if (dataConfig.cacheSeconds > 0) {
+                dataCache.set(dataName, result.data, dataConfig.cacheSeconds);
+            }
+            response.json({
+                success: true,
+                data: result.data,
+                fromCache: false
+            });
+        }
+        else {
+            response.json({
+                success: false,
+                error: result.error,
+                message: result.message
+            });
+        }
+    });
+    return router;
+}

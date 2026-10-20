@@ -1,16 +1,18 @@
-import { Service } from "node-windows";
+/* eslint-disable unicorn/filename-case */
+/* eslint-disable no-console */
 
-import { windowsServiceConfig } from "./windowsServiceConfig";
+import { Service } from 'node-windows'
 
+import { windowsServiceConfig } from './windowsServiceConfig.js'
 
 // Create a new service object
-var svc = new Service(windowsServiceConfig);
+const svc = new Service(windowsServiceConfig)
 
 // Listen for the "uninstall" event so we know when it's done.
-svc.on("uninstall", function() {
-  console.log("Uninstall complete.");
-  console.log("The service exists: ", svc.exists);
-});
+svc.on('uninstall', () => {
+  console.log('Uninstall complete.')
+  console.log('The service exists:', svc.exists)
+})
 
 // Uninstall the service.
-svc.uninstall();
+svc.uninstall()
