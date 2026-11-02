@@ -23,7 +23,7 @@
   "dependencies": {
     "@cacheable/node-cache": "^3.1.1",
     "@cityssm/is-private-network-address": "^1.0.0",
-    "@cityssm/mssql-multi-pool": "^5.2.0",
+    "@cityssm/mssql-multi-pool": "^6.0.0",
     "compression": "^1.8.2",
     "debug": "^4.4.3",
     "express": "^5.3.0"
